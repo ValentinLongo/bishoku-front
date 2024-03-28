@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Button, Space, Input, Form, Typography } from 'antd';
+import { Table, Button, Input, Form, Typography } from 'antd';
 import axios from 'axios';
 
 const { Text } = Typography;
@@ -9,6 +9,7 @@ const NuevoPedido = () => {
   const [productosSeleccionados, setProductosSeleccionados] = useState([]);
   const [nombre, setNombre] = useState('');
   const [direccion, setDireccion] = useState('');
+  const [ubicacion, setUbicacion] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -23,8 +24,12 @@ const NuevoPedido = () => {
     fetchData();
   }, []);
 
-  const handleAgregarProducto = (record) => {
-    setProductosSeleccionados([...productosSeleccionados, record]);
+  const handleAgregarProducto = (item) => {
+    if (typeof item === 'number') {
+      setUbicacion([...ubicacion, item]);
+    } else {
+      setProductosSeleccionados([...productosSeleccionados, item]);
+    }
   };
 
   const handleEliminarProducto = (record) => {
@@ -42,6 +47,7 @@ const NuevoPedido = () => {
     console.log('Nombre:', nombre);
     console.log('Dirección:', direccion);
     console.log('Productos Seleccionados:', productosSeleccionados);
+    console.log('Ubicación:', ubicacion);
     console.log('Precio Total:', calcularPrecioTotal());
   };
 
@@ -91,6 +97,22 @@ const NuevoPedido = () => {
     },
   ];
 
+  const renderBotonesNumerados = () => {
+    return (
+      <>
+        {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 'Retiro'].map((item, index) => (
+          <Button
+            key={index}
+            style={{ marginRight: '8px', marginBottom: '8px', backgroundColor: ubicacion.includes(item) ? 'green' : '' }}
+            onClick={() => handleAgregarProducto(item)}
+          >
+            {item}
+          </Button>
+        ))}
+      </>
+    );
+  };
+
   return (
     <div>
       <h1>Carga de Nuevo Pedido</h1>
@@ -102,6 +124,7 @@ const NuevoPedido = () => {
           <Input value={direccion} onChange={(e) => setDireccion(e.target.value)} />
         </Form.Item>
       </Form>
+      {renderBotonesNumerados()}
       <Table dataSource={productos} columns={columns} rowKey="_id" />
       <h2>Productos Seleccionados</h2>
       <Table
