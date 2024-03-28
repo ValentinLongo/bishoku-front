@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Button, Input, Form, Typography } from 'antd';
+import { Table, Button, Input, Form, Typography, Modal } from 'antd';
 import axios from 'axios';
 
 const { Text } = Typography;
@@ -10,6 +10,7 @@ const NuevoPedido = () => {
   const [nombre, setNombre] = useState('');
   const [direccion, setDireccion] = useState('');
   const [ubicacion, setUbicacion] = useState([]);
+  const [modalVisible, setModalVisible] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -43,16 +44,34 @@ const NuevoPedido = () => {
     return productosSeleccionados.reduce((total, producto) => total + producto.precio, 0);
   };
 
-  const handleGuardarPedido = () => {
-    console.log('Nombre:', nombre);
-    console.log('Dirección:', direccion);
-    console.log('Productos Seleccionados:', productosSeleccionados);
-    console.log('Ubicación:', ubicacion);
-    console.log('Precio Total:', calcularPrecioTotal());
+  const handleGuardarPedido = async () => {
+    try {
+      const nuevoPedido = {
+        nombre,
+        direccion,
+        ubicacion,
+        productosSeleccionados,
+        precioTotal: calcularPrecioTotal(),
+      };
+      const response = await axios.post('https://bishoku-back.vercel.app/api/pedidos', nuevoPedido);
+      console.log('Pedido guardado:', response.data);
+      setModalVisible(true);
+      setNombre('');
+      setDireccion('');
+      setUbicacion([]);
+      setProductosSeleccionados([]);
+    } catch (error) {
+      console.error('Error al guardar el pedido:', error);
+    }
   };
 
   const handleAgregarRetiro = () => {
     setUbicacion([...ubicacion, 'Retiro']);
+  };
+
+  const handleAceptarModal = () => {
+    setModalVisible(false);
+    window.location.reload(); // Refrescar la página
   };
 
   const columns = [
@@ -154,6 +173,17 @@ const NuevoPedido = () => {
           </>
         )}
       />
+      <Modal
+        title="Pedido guardado"
+        visible={modalVisible}
+        footer={[
+          <Button key="aceptar" type="primary" onClick={handleAceptarModal}>
+            Aceptar
+          </Button>,
+        ]}
+      >
+        <p>El pedido se ha guardado correctamente.</p>
+      </Modal>
     </div>
   );
 };
