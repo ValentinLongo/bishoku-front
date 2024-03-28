@@ -1,6 +1,6 @@
 import React from 'react';
 import { Layout, Menu, theme } from 'antd';
-import { Link, Route, Routes } from 'react-router-dom';
+import { Link, Navigate, Route, Routes } from 'react-router-dom'; // Cambio de Redirect a Navigate
 import { Content } from 'antd/es/layout/layout';
 import Productos from './components/productos';
 import Pedidos from './components/pedidos';
@@ -50,11 +50,12 @@ const App = () => {
         </Menu>
       </Header>
       <Content>
-      <Routes>
-        <Route path="/productos" element={<Productos />} />
-        <Route path="/pedidos" element={<Pedidos />} />
-        <Route path="/nuevoPedido" element={<NuevoPedido />} />
-      </Routes>
+        <Routes>
+          <Route path="/" element={<Navigate to="/pedidos" />} />
+          <Route path="/productos" element={<Productos />} />
+          <Route path="/pedidos" element={<Pedidos />} />
+          <Route path="/nuevoPedido" element={<NuevoPedido />} />
+        </Routes>
       </Content>
     </Layout>
   );
