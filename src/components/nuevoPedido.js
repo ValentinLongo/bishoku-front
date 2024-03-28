@@ -51,6 +51,10 @@ const NuevoPedido = () => {
     console.log('Precio Total:', calcularPrecioTotal());
   };
 
+  const handleAgregarRetiro = () => {
+    setUbicacion([...ubicacion, 'Retiro']);
+  };
+
   const columns = [
     {
       title: 'Descripción',
@@ -100,7 +104,7 @@ const NuevoPedido = () => {
   const renderBotonesNumerados = () => {
     return (
       <>
-        {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 'Retiro'].map((item, index) => (
+        {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((item, index) => (
           <Button
             key={index}
             style={{ marginRight: '8px', marginBottom: '8px', backgroundColor: ubicacion.includes(item) ? 'green' : '' }}
@@ -109,6 +113,12 @@ const NuevoPedido = () => {
             {item}
           </Button>
         ))}
+        <Button
+          style={{ marginRight: '8px', marginBottom: '8px', backgroundColor: ubicacion.includes('Retiro') ? 'green' : '' }}
+          onClick={handleAgregarRetiro}
+        >
+          Retiro
+        </Button>
       </>
     );
   };
