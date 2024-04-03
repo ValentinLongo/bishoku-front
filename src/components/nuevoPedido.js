@@ -44,6 +44,73 @@ const NuevoPedido = () => {
     return productosSeleccionados.reduce((total, producto) => total + producto.precio, 0);
   };
 
+  const generarHTMLPedido = () => {
+    const productosHTML = productosSeleccionados.map(producto => `
+      <tr>
+        <td>${producto.descripcion}</td>
+        <td>$${producto.precio}</td>
+      </tr>
+    `).join('');
+
+    const html = `
+      <!DOCTYPE html>
+      <html lang="es">
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Imprimir Pedido</title>
+        <style>
+          body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+          }
+          .container {
+            max-width: 58mm;
+            padding: 10px;
+            border: 1px solid #000;
+          }
+          h1, h2 {
+            text-align: center;
+            margin-bottom: 10px;
+          }
+          p {
+            margin: 5px 0;
+          }
+          table {
+            width: 100%;
+            border-collapse: collapse;
+          }
+          th, td {
+            border: 1px solid #000;
+            padding: 5px;
+          }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <h1>Detalle del Pedido</h1>
+          <h2>Datos del Cliente</h2>
+          <p><strong>Nombre:</strong> ${nombre}</p>
+          <p><strong>Dirección:</strong> ${direccion}</p>
+          <p><strong>Ubicación:</strong> ${ubicacion.join(', ')}</p>
+          <h2>Productos Seleccionados</h2>
+          <table>
+            <tr>
+              <th>Descripción</th>
+              <th>Precio</th>
+            </tr>
+            ${productosHTML}
+          </table>
+          <p><strong>Total:</strong> $${calcularPrecioTotal()}</p>
+        </div>
+      </body>
+      </html>
+    `;
+
+    return html;
+  };
+
   const handleGuardarPedido = async () => {
     try {
       const nuevoPedido = {
@@ -60,6 +127,15 @@ const NuevoPedido = () => {
       setDireccion('');
       setUbicacion([]);
       setProductosSeleccionados([]);
+
+      const htmlPedido = generarHTMLPedido(); // Generar el HTML del pedido
+      const ventanaImpresion = window.open('', '_blank'); // Abrir la ventana de impresión
+      ventanaImpresion.document.write(htmlPedido); // Escribir el HTML en la ventana de impresión
+      ventanaImpresion.document.close(); // Cerrar el documento para que se pueda imprimir
+      ventanaImpresion.onload = () => {
+        ventanaImpresion.print(); // Imprimir el contenido
+        ventanaImpresion.close(); // Cerrar la ventana de impresión después de imprimir
+      };
     } catch (error) {
       console.error('Error al guardar el pedido:', error);
     }
