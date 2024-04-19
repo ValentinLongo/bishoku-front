@@ -27,7 +27,14 @@ const NuevoPedido = () => {
 
   const handleAgregarProducto = (item) => {
     if (typeof item === 'number') {
-      setUbicacion([...ubicacion, item]);
+      if (ubicacion.includes(item)) {
+        // Si el elemento ya está en la lista, eliminarlo y restaurar el color original
+        const updatedUbicacion = ubicacion.filter((ubic) => ubic !== item);
+        setUbicacion(updatedUbicacion);
+      } else {
+        // Si no está en la lista, agregarlo y cambiar el color a verde
+        setUbicacion([...ubicacion, item]);
+      }
     } else {
       setProductosSeleccionados([...productosSeleccionados, item]);
     }
