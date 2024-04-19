@@ -11,6 +11,7 @@ const NuevoPedido = () => {
   const [direccion, setDireccion] = useState('');
   const [ubicacion, setUbicacion] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
+  const [busquedaDescripcion, setBusquedaDescripcion] = useState('');
 
   useEffect(() => {
     const fetchData = async () => {
@@ -226,7 +227,7 @@ const NuevoPedido = () => {
   };
 
   return (
-    <div>
+    <div style={{ margin: '15px' }}>
       <h1>Carga de Nuevo Pedido</h1>
       <Form>
         <Form.Item label="Nombre">
@@ -237,7 +238,14 @@ const NuevoPedido = () => {
         </Form.Item>
       </Form>
       {renderBotonesNumerados()}
-      <Table dataSource={productos} columns={columns} rowKey="_id" />
+      <Form.Item label="Buscar: ">
+        <Input value={busquedaDescripcion} onChange={(e) => setBusquedaDescripcion(e.target.value)} />
+      </Form.Item>
+      <Table
+        dataSource={productos.filter(producto => producto.descripcion.toLowerCase().includes(busquedaDescripcion.toLowerCase()))}
+        columns={columns}
+        rowKey="_id"
+      />
       <h2>Productos Seleccionados</h2>
       <Table
         dataSource={productosSeleccionados}
