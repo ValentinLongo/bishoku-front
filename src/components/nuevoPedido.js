@@ -73,7 +73,7 @@ const NuevoPedido = () => {
             padding: 0;
           }
           .container {
-            max-width: 58mm;
+            max-width: 80mm;
             padding: 10px;
             border: 1px solid #000;
           }
