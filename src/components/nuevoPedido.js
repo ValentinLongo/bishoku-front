@@ -323,6 +323,10 @@ const NuevoPedido = () => {
         </Form.Item>
       </Form>
       {renderBotonesNumerados()}
+      <Form.Item label="Buscar: ">
+        <Input value={busquedaDescripcion} onChange={(e) => setBusquedaDescripcion(e.target.value)} />
+      </Form.Item>
+
       <Table
         dataSource={productos.filter(producto => producto.descripcion.toLowerCase().includes(busquedaDescripcion.toLowerCase()))}
         columns={columns}
