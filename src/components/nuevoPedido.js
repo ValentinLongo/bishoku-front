@@ -11,7 +11,13 @@ const NuevoPedido = () => {
   const [direccion, setDireccion] = useState('');
   const [ubicacion, setUbicacion] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
+  const [modalProductos, setModalProductos] = useState([]);
+  const [modalProductosSeleccionados, setModalProductosSeleccionados] = useState([]);
   const [busquedaDescripcion, setBusquedaDescripcion] = useState('');
+  const [comboId, setComboId] = useState('');
+  const [comboPrecio, setComboPrecio] = useState(0);
+  const [comboDescripcion, setComboDescripcion] = useState('');
+  const [comboSubproductos, setComboSubproductos] = useState([]); // Estado para los subproductos del Combo
 
   useEffect(() => {
     const fetchData = async () => {
@@ -29,15 +35,25 @@ const NuevoPedido = () => {
   const handleAgregarProducto = (item) => {
     if (typeof item === 'number') {
       if (ubicacion.includes(item)) {
-        // Si el elemento ya está en la lista, eliminarlo y restaurar el color original
         const updatedUbicacion = ubicacion.filter((ubic) => ubic !== item);
         setUbicacion(updatedUbicacion);
       } else {
-        // Si no está en la lista, agregarlo y cambiar el color a verde
         setUbicacion([...ubicacion, item]);
       }
     } else {
-      setProductosSeleccionados([...productosSeleccionados, item]);
+      if (item.categoria === 'Combo') {
+        setModalProductos(
+          productos.filter((producto) => producto.categoria === 'Sushi')
+        );
+        setModalProductosSeleccionados([]);
+        setModalVisible(true);
+        setComboId(item._id);
+        setComboPrecio(item.precio);
+        setComboDescripcion(item.descripcion);
+        setComboSubproductos([]); // Limpiar los subproductos al seleccionar un nuevo Combo
+      } else {
+        setProductosSeleccionados([...productosSeleccionados, item]);
+      }
     }
   };
 
@@ -48,15 +64,53 @@ const NuevoPedido = () => {
     setProductosSeleccionados(updatedProductosSeleccionados);
   };
 
+  const handleAgregarSubProducto = (item) => {
+    setComboSubproductos([...comboSubproductos, item]); // Agregar subproducto al Combo seleccionado
+    setModalProductosSeleccionados([...modalProductosSeleccionados, item]);
+  };
+
+  const handleGuardarSubProductos = () => {
+    setModalVisible(false);
+
+    const productoComboIndex = productosSeleccionados.findIndex(
+      (producto) => producto.categoria === 'Combo'
+    );
+
+    if (productoComboIndex !== -1) {
+      const productoCombo = productosSeleccionados[productoComboIndex];
+      productoCombo.subproductos = comboSubproductos; // Asignar los subproductos al Combo en productosSeleccionados
+      const updatedProductosSeleccionados = [...productosSeleccionados];
+      updatedProductosSeleccionados[productoComboIndex] = productoCombo;
+      setProductosSeleccionados(updatedProductosSeleccionados);
+    } else {
+      const productoCombo = {
+        _id: comboId,
+        descripcion: comboDescripcion,
+        precio: comboPrecio,
+        subproductos: comboSubproductos,
+      };
+      setProductosSeleccionados([...productosSeleccionados, productoCombo]);
+    }
+
+    setModalProductosSeleccionados([]);
+  };
+
   const calcularPrecioTotal = () => {
     return productosSeleccionados.reduce((total, producto) => total + producto.precio, 0);
   };
 
   const generarHTMLPedido = () => {
-    const productosHTML = productosSeleccionados.map(producto => `
+    const productosHTML = productosSeleccionados.map((producto) => `
       <tr>
         <td>${producto.descripcion}</td>
         <td>$${producto.precio}</td>
+      </tr>
+    `).join('');
+
+    const subproductosHTML = comboSubproductos.map((subproducto) => `
+      <tr>
+        <td>${subproducto.descripcion}</td>
+        <td>0</td>
       </tr>
     `).join('');
 
@@ -97,7 +151,7 @@ const NuevoPedido = () => {
       </head>
       <body>
         <div class="container">
-          <h1>Detalle del Pedido</h1>
+          <h1>BISHOKU</h1>
           <h2>Datos del Cliente</h2>
           <p><strong>Nombre:</strong> ${nombre}</p>
           <p><strong>Dirección:</strong> ${direccion}</p>
@@ -109,6 +163,14 @@ const NuevoPedido = () => {
               <th>Precio</th>
             </tr>
             ${productosHTML}
+          </table>
+          <h2>Subproductos del Combo</h2>
+          <table>
+            <tr>
+              <th>Descripción</th>
+              <th>Precio</th>
+            </tr>
+            ${subproductosHTML}
           </table>
           <p><strong>Total:</strong> $${calcularPrecioTotal()}</p>
         </div>
@@ -136,13 +198,13 @@ const NuevoPedido = () => {
       setUbicacion([]);
       setProductosSeleccionados([]);
 
-      const htmlPedido = generarHTMLPedido(); // Generar el HTML del pedido
-      const ventanaImpresion = window.open('', '_blank'); // Abrir la ventana de impresión
-      ventanaImpresion.document.write(htmlPedido); // Escribir el HTML en la ventana de impresión
-      ventanaImpresion.document.close(); // Cerrar el documento para que se pueda imprimir
+      const htmlPedido = generarHTMLPedido();
+      const ventanaImpresion = window.open('', '_blank');
+      ventanaImpresion.document.write(htmlPedido);
+      ventanaImpresion.document.close();
       ventanaImpresion.onload = () => {
-        ventanaImpresion.print(); // Imprimir el contenido
-        ventanaImpresion.close(); // Cerrar la ventana de impresión después de imprimir
+        ventanaImpresion.print();
+        ventanaImpresion.close();
       };
     } catch (error) {
       console.error('Error al guardar el pedido:', error);
@@ -155,7 +217,7 @@ const NuevoPedido = () => {
 
   const handleAceptarModal = () => {
     setModalVisible(false);
-    window.location.reload(); // Refrescar la página
+    window.location.reload();
   };
 
   const columns = [
@@ -204,6 +266,29 @@ const NuevoPedido = () => {
     },
   ];
 
+  const modalColumns = [
+    {
+      title: 'Descripción',
+      dataIndex: 'descripcion',
+      key: 'descripcion',
+    },
+    {
+      title: 'Precio',
+      dataIndex: 'precio',
+      key: 'precio',
+      render: (text, record) => `$${text}`,
+    },
+    {
+      title: 'Acción',
+      key: 'action',
+      render: (text, record) => (
+        <Button type="primary" onClick={() => handleAgregarSubProducto(record)}>
+          Agregar
+        </Button>
+      ),
+    },
+  ];
+
   const renderBotonesNumerados = () => {
     return (
       <>
@@ -238,9 +323,6 @@ const NuevoPedido = () => {
         </Form.Item>
       </Form>
       {renderBotonesNumerados()}
-      <Form.Item label="Buscar: ">
-        <Input value={busquedaDescripcion} onChange={(e) => setBusquedaDescripcion(e.target.value)} />
-      </Form.Item>
       <Table
         dataSource={productos.filter(producto => producto.descripcion.toLowerCase().includes(busquedaDescripcion.toLowerCase()))}
         columns={columns}
@@ -265,15 +347,32 @@ const NuevoPedido = () => {
         )}
       />
       <Modal
-        title="Pedido guardado"
+        title="Seleccionar Subproducto"
         visible={modalVisible}
+        onCancel={() => setModalVisible(false)}
         footer={[
-          <Button key="aceptar" type="primary" onClick={handleAceptarModal}>
+          <Button key="cancelar" onClick={() => setModalVisible(false)}>
+            Cancelar
+          </Button>,
+          <Button key="aceptar" type="primary" onClick={handleGuardarSubProductos}>
             Aceptar
           </Button>,
         ]}
       >
-        <p>El pedido se ha guardado correctamente.</p>
+        <Form.Item label="Buscar: ">
+          <Input value={busquedaDescripcion} onChange={(e) => setBusquedaDescripcion(e.target.value)} />
+        </Form.Item>
+        <Table
+          dataSource={modalProductos.filter(producto => producto.descripcion.toLowerCase().includes(busquedaDescripcion.toLowerCase()))}
+          columns={modalColumns}
+          rowKey="_id"
+        />
+        <h3>Subproductos Seleccionados:</h3>
+        <ul>
+          {modalProductosSeleccionados.map((subproducto) => (
+            <li key={subproducto._id}>{subproducto.descripcion}</li>
+          ))}
+        </ul>
       </Modal>
     </div>
   );

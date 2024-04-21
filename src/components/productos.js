@@ -6,6 +6,7 @@ const Productos = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [nuevoProductoDescripcion, setNuevoProductoDescripcion] = useState('');
   const [nuevoProductoPrecio, setNuevoProductoPrecio] = useState(0);
+  const [nuevaCategoria, setNuevaCategoria] = useState('');
   const [productoEditandoId, setProductoEditandoId] = useState(null);
   const [productos, setProductos] = useState([]);
 
@@ -27,6 +28,7 @@ const Productos = () => {
     setProductoEditandoId(null);
     setNuevoProductoDescripcion('');
     setNuevoProductoPrecio(0);
+    setNuevaCategoria('');
   };
 
   const handleEditarProducto = (id) => {
@@ -35,6 +37,7 @@ const Productos = () => {
     const productoEditando = productos.find((producto) => producto._id === id);
     setNuevoProductoDescripcion(productoEditando.descripcion);
     setNuevoProductoPrecio(productoEditando.precio);
+    setNuevaCategoria(productoEditando.categoria || ''); // Manejar el caso de que el producto no tenga categoría
   };
 
   const handleAceptar = async () => {
@@ -43,11 +46,13 @@ const Productos = () => {
         await axios.put(`https://bishoku-back.vercel.app/api/productos/${productoEditandoId}`, {
           descripcion: nuevoProductoDescripcion,
           precio: nuevoProductoPrecio,
+          categoria: nuevaCategoria,
         });
       } else {
         await axios.post('https://bishoku-back.vercel.app/api/productos', {
           descripcion: nuevoProductoDescripcion,
           precio: nuevoProductoPrecio,
+          categoria: nuevaCategoria,
         });
       }
 
@@ -55,6 +60,7 @@ const Productos = () => {
       setNuevoProductoDescripcion('');
       setNuevoProductoPrecio(0);
       setProductoEditandoId(null);
+      setNuevaCategoria('');
       const response = await axios.get('https://bishoku-back.vercel.app/api/productos');
       setProductos(response.data);
     } catch (error) {
@@ -83,6 +89,11 @@ const Productos = () => {
       dataIndex: 'precio',
       key: 'precio',
       render: (text, record) => `$${text}`,
+    },
+    {
+      title: 'Categoría',
+      dataIndex: 'categoria',
+      key: 'categoria',
     },
     {
       title: 'Acciones',
@@ -116,6 +127,7 @@ const Productos = () => {
           setNuevoProductoDescripcion('');
           setNuevoProductoPrecio(0);
           setProductoEditandoId(null);
+          setNuevaCategoria('');
         }}
       >
         <Input
@@ -130,6 +142,19 @@ const Productos = () => {
           value={nuevoProductoPrecio}
           onChange={(value) => setNuevoProductoPrecio(value)}
         />
+        <br />
+        <br />
+        <select
+          value={nuevaCategoria}
+          onChange={(e) => setNuevaCategoria(e.target.value)}
+        >
+          <option value="">Seleccione una categoría</option>
+          <option value="Sushi">Sushi</option>
+          <option value="Bebida">Bebida</option>
+          <option value="Combo">Combo</option>
+          <option value="Postre">Postre</option>
+          <option value="Entrada">Entrada</option>
+        </select>
       </Modal>
     </>
   );
