@@ -292,15 +292,6 @@ const NuevoPedido = () => {
   const renderBotonesNumerados = () => {
     return (
       <>
-        {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((item, index) => (
-          <Button
-            key={index}
-            style={{ marginRight: '8px', marginBottom: '8px', backgroundColor: ubicacion.includes(item) ? 'green' : '' }}
-            onClick={() => handleAgregarProducto(item)}
-          >
-            {item}
-          </Button>
-        ))}
         <Button
           style={{ marginRight: '8px', marginBottom: '8px', backgroundColor: ubicacion.includes('Retiro') ? 'green' : '' }}
           onClick={handleAgregarRetiro}
@@ -318,7 +309,7 @@ const NuevoPedido = () => {
         <Form.Item label="Nombre">
           <Input value={nombre} onChange={(e) => setNombre(e.target.value)} />
         </Form.Item>
-        <Form.Item label="Dirección">
+        <Form.Item label="Descripción">
           <Input value={direccion} onChange={(e) => setDireccion(e.target.value)} />
         </Form.Item>
       </Form>

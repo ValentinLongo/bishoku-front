@@ -5,6 +5,7 @@ import { Content } from 'antd/es/layout/layout';
 import Productos from './components/productos';
 import Pedidos from './components/pedidos';
 import NuevoPedido from './components/nuevoPedido';
+import Asientos from './components/asientos';
 
 const { Header } = Layout;
 
@@ -15,8 +16,10 @@ const App = () => {
 
   const items = [
     { key: '1', label: 'Pedidos', to: '/pedidos' },
-    { key: '2', label: 'Nuevo Pedido', to: '/nuevoPedido' },
-    { key: '3', label: 'Productos', to: '/productos' },
+    { key: '2', label: 'Retiro', to: '/nuevoPedido' },
+    { key: '3', label: 'Mesas', to: '/mesas' },
+    { key: '4', label: 'Productos', to: '/productos' },
+
   ];
 
   return (
@@ -55,6 +58,7 @@ const App = () => {
           <Route path="/productos" element={<Productos />} />
           <Route path="/pedidos" element={<Pedidos />} />
           <Route path="/nuevoPedido" element={<NuevoPedido />} />
+          <Route path="/mesas" element={<Asientos />} />
         </Routes>
       </Content>
     </Layout>
