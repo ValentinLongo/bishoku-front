@@ -51,7 +51,6 @@ const Pedidos = () => {
       render: (text, record) => (
         <>
           <Button type="primary" onClick={() => handleMostrarDetalle(record)}>Detalle</Button>
-          <Button type="primary" style={{ marginLeft: '5px' }} danger onClick={() => handleEliminarPedido(record)}>Eliminar</Button>
           <Button type="primary" style={{ marginLeft: '5px', backgroundColor: 'green' }} onClick={() => handleImprimir(record)}>Imprimir</Button>
         </>
       ),
@@ -79,26 +78,7 @@ const Pedidos = () => {
     };
   };
 
-  const handleEliminarPedido = (record) => {
-    setConfirmVisible(true);
-    setPedidoAEliminar(record);
-  };
-
-  const handleConfirmarEliminacion = async () => {
-    setConfirmVisible(false);
-    if (pedidoAEliminar) {
-      try {
-        await axios.delete(`https://bishoku-back.vercel.app/api/pedidos/${pedidoAEliminar._id}`);
-        message.success('Pedido eliminado correctamente');
-        // Actualizar la lista de pedidos después de eliminar
-        const updatedPedidos = pedidos.filter((pedido) => pedido._id !== pedidoAEliminar._id);
-        setPedidos(updatedPedidos);
-      } catch (error) {
-        console.error('Error al eliminar pedido:', error);
-        message.error('Error al eliminar el pedido');
-      }
-    }
-  };
+  
 
   const calcularPrecioTotal = (imprimir) => {
     return imprimir.productosSeleccionados.reduce((total, producto) => total + producto.precio, 0);
@@ -194,14 +174,6 @@ const Pedidos = () => {
         </ul>
       </Modal>
 
-      <Modal
-        title="Confirmar Eliminación"
-        visible={confirmVisible}
-        onOk={handleConfirmarEliminacion}
-        onCancel={() => setConfirmVisible(false)}
-      >
-        ¿Está seguro que desea eliminar este pedido?
-      </Modal>
     </div>
   );
 };
